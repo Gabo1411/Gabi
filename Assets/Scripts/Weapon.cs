@@ -27,7 +27,16 @@ public class Weapon : MonoBehaviour
     public int magazineSize, bulletsLeft;
     public bool isReloading;
 
-   
+    public Vector3 spawnPosition;
+    public Vector3 spawnRotation;
+
+    public enum WeaponModel
+    {
+        M107,
+        AK74
+    }
+    public WeaponModel thisWeaponModel;
+
     private void Awake()
     {
         readytoFire = true;
@@ -35,11 +44,16 @@ public class Weapon : MonoBehaviour
         bulletsLeft = magazineSize;
     }
 
+    
     void Update()
     {
         if (bulletsLeft == 0 && isFiring)
         {
-            SoundManager.instance.emptySoundM107.Play();
+            // Usar PlayOneShot para evitar reiniciar el clip si ya se está reproduciendo
+            if (SoundManager.instance != null && SoundManager.instance.emptySoundM107 != null && SoundManager.instance.emptySoundM107.clip != null)
+            {
+                SoundManager.instance.emptySoundM107.PlayOneShot(SoundManager.instance.emptySoundM107.clip);
+            }
         }
 
         // Arma automática: mantener presionado para disparar
@@ -65,7 +79,14 @@ public class Weapon : MonoBehaviour
     { 
     isReloading = true;
     Invoke("FinishReloading", reloadTime);
-    SoundManager.instance.reloadM107.Play();
+    // Usar PlayOneShot para no interferir con otros sonidos
+    if (SoundManager.instance != null && SoundManager.instance.reloadM107 != null && SoundManager.instance.reloadM107.clip != null)
+    {
+        SoundManager.instance.reloadM107.PlayOneShot(SoundManager.instance.reloadM107.clip);
+    }
+
+    animator.SetTrigger("Reload");
+
     }
     private void FinishReloading()
     {
@@ -78,7 +99,10 @@ public class Weapon : MonoBehaviour
     {   
         if (bulletsLeft == 0 && isFiring)
         {
-            SoundManager.instance.emptySoundM107.Play();
+            if (SoundManager.instance != null && SoundManager.instance.emptySoundM107 != null && SoundManager.instance.emptySoundM107.clip != null)
+            {
+                SoundManager.instance.emptySoundM107.PlayOneShot(SoundManager.instance.emptySoundM107.clip);
+            }
         }
         // Si no hay balas o se está recargando, no disparar
         if (isReloading || bulletsLeft <=0)
@@ -93,7 +117,11 @@ public class Weapon : MonoBehaviour
 
         muzzleEffect.GetComponent<ParticleSystem>().Play();
        animator.SetTrigger("RECOIL");
-        SoundManager.instance.shootingSoundM107.Play();
+        // Reproducir el sonido de disparo sin reiniciar si ya está sonando
+        if (SoundManager.instance != null && SoundManager.instance.shootingSoundM107 != null && SoundManager.instance.shootingSoundM107.clip != null)
+        {
+            SoundManager.instance.shootingSoundM107.PlayOneShot(SoundManager.instance.shootingSoundM107.clip);
+        }
         readytoFire = false;
 
         Vector3 shootingDirection = CalculateDirectionAndSpread().normalized;
