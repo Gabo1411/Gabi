@@ -8,6 +8,9 @@ public class PlayerMovement : MonoBehaviour
     public float gravity = -9.81f * 2;
     public float jumpHeight = 3f;
 
+    public int maxHealth = 50;
+    public int Health;
+
     public Transform groundCheck;
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
@@ -22,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
         controller = GetComponent<CharacterController>();
         // Initialize lastPosition to current position to avoid a false positive movement on the first frame
         lastPosition = transform.position;
+
+        Health = maxHealth;
+
     }
 
 
