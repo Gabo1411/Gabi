@@ -85,7 +85,11 @@ public class Weapon : MonoBehaviour
         SoundManager.instance.reloadM107.PlayOneShot(SoundManager.instance.reloadM107.clip);
     }
 
-    animator.SetTrigger("Reload");
+    // Solo activar el trigger si el parámetro existe en el Animator
+    if (HasAnimatorParameter("Reload"))
+    {
+        animator.SetTrigger("Reload");
+    }
 
     }
     private void FinishReloading()
@@ -116,7 +120,11 @@ public class Weapon : MonoBehaviour
 
 
         muzzleEffect.GetComponent<ParticleSystem>().Play();
-       animator.SetTrigger("RECOIL");
+        // Activar recoil solo si el parámetro existe
+        if (HasAnimatorParameter("RECOIL"))
+        {
+            animator.SetTrigger("RECOIL");
+        }
         // Reproducir el sonido de disparo sin reiniciar si ya está sonando
         if (SoundManager.instance != null && SoundManager.instance.shootingSoundM107 != null && SoundManager.instance.shootingSoundM107.clip != null)
         {
@@ -170,6 +178,17 @@ public class Weapon : MonoBehaviour
     {
         yield return new WaitForSeconds(delay);
         Destroy(bullet);
+    }
+
+    // Comprueba si el Animator tiene un parámetro con el nombre dado
+    private bool HasAnimatorParameter(string paramName)
+    {
+        if (animator == null) return false;
+        foreach (var p in animator.parameters)
+        {
+            if (p.name == paramName) return true;
+        }
+        return false;
     }
 }
 
