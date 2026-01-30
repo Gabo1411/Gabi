@@ -15,13 +15,16 @@ public class PlayerMovement : MonoBehaviour
     Vector3 velocity;
     bool isGrounded;
     bool isMoving;
-    private Vector3 lastPosition = new Vector3(0f,0f,0f);
+    public bool IsMoving => isMoving; // Expose read-only property so the field is read and the compiler warning disappears
+    private Vector3 lastPosition = new Vector3(0f, 0f, 0f);
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        // Initialize lastPosition to current position to avoid a false positive movement on the first frame
+        lastPosition = transform.position;
     }
 
-    
+
     void Update()
     {
         //Verificar si el personaje esta en el suelo
@@ -30,7 +33,7 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y = -2f;
         }
-        
+
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
