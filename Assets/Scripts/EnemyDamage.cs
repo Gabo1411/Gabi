@@ -7,13 +7,13 @@ public class EnemyDamage : MonoBehaviour
 
     private float nextDamageTime = 0f;
 
-    private void OnTriggerStay(Collider other)
+    private void OnCollisionStay(Collision collision)
     {
-        if (!other.CompareTag("Player")) return;
+        if (!collision.gameObject.CompareTag("Player")) return;
 
         if (Time.time >= nextDamageTime)
         {
-            PlayerMovement player = other.GetComponent<PlayerMovement>();
+            PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
 
             if (player != null)
             {
