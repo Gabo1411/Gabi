@@ -6,14 +6,21 @@ public class BulletDamage : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Enemy enemy = collision.collider.GetComponent<Enemy>();
-
-        if (enemy != null)
+        // 1. Si choca con enemigo, hacer daño
+        if (collision.gameObject.CompareTag("Enemy"))
         {
-            enemy.TakeDamage(damage);
+            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage);
+            }
+            Destroy(gameObject); // Destruir bala
         }
-
-        Destroy(gameObject);
+        // 2. Si choca con pared o suelo, solo destruirse
+        else if (!collision.gameObject.CompareTag("Player"))
+        {
+            // El !Tag("Player") evita que la bala se destruya al salir del arma si choca con el propio jugador por error
+            Destroy(gameObject);
+        }
     }
 }
-

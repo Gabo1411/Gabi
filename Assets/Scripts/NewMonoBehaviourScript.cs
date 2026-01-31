@@ -1,64 +1,50 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class EnemyChase : MonoBehaviour
 {
     public Transform player;
     public float speed = 3f;
     public float stoppingDistance = 1.5f;
 
-    [Header("Separation")]
-    public float separationRadius = 1.2f;
-    public float separationStrength = 2f;
+    private Rigidbody rb;
 
-    void Update()
+    void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+        // Importante: Si no asignas el player manual, lo busca por Tag
+        if (player == null)
+        {
+            GameObject p = GameObject.FindGameObjectWithTag("Player");
+            if (p != null) player = p.transform;
+        }
+    }
+
+    void FixedUpdate() // Usamos FixedUpdate para físicas
     {
         if (player == null) return;
 
-        // === PERSECUCIÓN (solo X/Z) ===
-        Vector3 targetPosition = new Vector3(
-            player.position.x,
-            transform.position.y,
-            player.position.z
-        );
+        // Calcular dirección
+        Vector3 direction = (player.position - transform.position).normalized;
+        direction.y = 0; // Evitar que intente volar o hundirse
 
-        Vector3 moveDirection = Vector3.zero;
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        float distanceToPlayer = Vector3.Distance(transform.position, targetPosition);
+        // Moverse si está lejos
         if (distanceToPlayer > stoppingDistance)
         {
-            moveDirection = (targetPosition - transform.position).normalized;
+            // MovePosition es la forma correcta de mover un Rigidbody Kinematic o normal sin teletransportarlo
+            Vector3 newPos = rb.position + direction * speed * Time.fixedDeltaTime;
+            rb.MovePosition(newPos);
         }
 
-        // === SEPARACIÓN ENTRE ENEMIGOS ===
-        Collider[] nearby = Physics.OverlapSphere(transform.position, separationRadius);
-        Vector3 separation = Vector3.zero;
-
-        foreach (Collider col in nearby)
+        // Rotar hacia el jugador
+        if (direction != Vector3.zero)
         {
-            if (col.gameObject == gameObject) continue;
-            if (!col.CompareTag("Enemy")) continue;
-
-            Vector3 diff = transform.position - col.transform.position;
-            diff.y = 0;
-
-            float dist = diff.magnitude;
-            if (dist > 0.001f)
-            {
-                separation += diff.normalized / dist;
-            }
-        }
-
-        // === MOVIMIENTO FINAL ===
-        Vector3 finalDirection = moveDirection + separation * separationStrength;
-        finalDirection.y = 0;
-
-        if (finalDirection != Vector3.zero)
-        {
-            transform.position += finalDirection.normalized * speed * Time.deltaTime;
-            transform.rotation = Quaternion.LookRotation(finalDirection);
+            Quaternion toRotation = Quaternion.LookRotation(direction, Vector3.up);
+            rb.rotation = Quaternion.RotateTowards(rb.rotation, toRotation, 360 * Time.fixedDeltaTime);
         }
     }
 }
-
 
 
