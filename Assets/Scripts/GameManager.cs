@@ -1,48 +1,65 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Necesario para reiniciar el nivel
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public GameObject winPanel;  // Arrastra aquí tu panel de Victoria (UI)
-    public GameObject losePanel; // Arrastra aquí tu panel de Derrota (UI)
+    [Header("Configuración")]
+    public float survivalTime = 60f; // Tiempo meta
 
-    public int enemyCount;
+    [Header("UI References")]
+    public TMP_Text timerText;
+    public GameObject winPanel;
+    public GameObject losePanel;
+
+    private float timeRemaining;
     private bool gameEnded = false;
 
     void Start()
     {
-        // Cuenta automáticamente cuántos enemigos hay en la escena al empezar
-        enemyCount = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        // --- NUEVO CÓDIGO PARA LEER LA MEMORIA ---
+        // Preguntamos: ¿Existe un dato guardado llamado "SurvivalTime"?
+        if (PlayerPrefs.HasKey("SurvivalTime"))
+        {
+            // Si existe, lo usamos para sobreescribir el tiempo
+            survivalTime = PlayerPrefs.GetFloat("SurvivalTime");
+        }
+        // ------------------------------------------
 
-        // Aseguramos que los paneles estén ocultos al inicio
+        timeRemaining = survivalTime;
+
         if (winPanel != null) winPanel.SetActive(false);
         if (losePanel != null) losePanel.SetActive(false);
     }
 
-    public void EnemyDefeated()
+    void Update()
     {
         if (gameEnded) return;
 
-        enemyCount--;
+        timeRemaining -= Time.deltaTime;
 
-        // Condición de Victoria
-        if (enemyCount <= 0)
+        if (timerText != null)
+        {
+            timerText.text = Mathf.Ceil(timeRemaining).ToString();
+        }
+
+        if (timeRemaining <= 0)
         {
             WinGame();
         }
     }
 
+    // ESTA ES LA FUNCIÓN QUE TU SCRIPT ESTABA BUSCANDO
     public void PlayerDied()
     {
-        if (gameEnded) return;
-        LoseGame();
+        if (!gameEnded) LoseGame();
     }
 
     void WinGame()
     {
         gameEnded = true;
+        Debug.Log("You Survived!");
 
-        // Liberar el mouse para poder hacer click
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -53,8 +70,8 @@ public class GameManager : MonoBehaviour
     void LoseGame()
     {
         gameEnded = true;
+        Debug.Log("Game Over");
 
-        // Liberar el mouse para poder hacer click
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
@@ -62,16 +79,14 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    // Llama a esta función desde un botón en tu UI para reiniciar
     public void RestartGame()
     {
-        Time.timeScale = 1f; // Reactivar el tiempo antes de recargar
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    // Llama a esto desde el botón "Salir"
+
     public void QuitGame()
     {
-        Debug.Log("Saliendo del juego..."); // Para que veas en la consola que funciona
         Application.Quit();
     }
 }

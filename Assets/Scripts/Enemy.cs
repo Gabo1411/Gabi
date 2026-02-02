@@ -16,14 +16,7 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        // CAMBIO: Usamos FindFirstObjectByType en lugar de FindObjectOfType
-        GameManager manager = FindFirstObjectByType<GameManager>();
-
-        if (manager != null)
-        {
-            manager.EnemyDefeated();
-        }
-
+        // Solo desaparece. No avisa al manager (porque ahora vamos por tiempo)
         Destroy(gameObject);
     }
 }
