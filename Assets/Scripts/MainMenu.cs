@@ -5,7 +5,7 @@ using TMPro; // Necesario para el Input Field
 public class MainMenu : MonoBehaviour
 {
     [Header("Configuración")]
-    public string nombreEscenaJuego = "SampleScene"; // PON AQUÍ EL NOMBRE EXACTO DE TU ESCENA DE JUEGO
+    public string nombreEscenaJuego = "Cripta"; // PON AQUÍ EL NOMBRE EXACTO DE TU ESCENA DE JUEGO
     public TMP_InputField inputTiempo; // Arrastra aquí el Input Field
 
     public void Jugar()
