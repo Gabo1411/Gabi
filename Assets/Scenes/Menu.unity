@@ -149,7 +149,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenu
   nombreEscenaJuego: Cripta
-  inputTiempo: {fileID: 0}
+  inputTiempo: {fileID: 1396876998}
 --- !u!4 &31694124
 Transform:
   m_ObjectHideFlags: 0
